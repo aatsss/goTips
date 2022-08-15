@@ -1,18 +1,23 @@
 // 双方向リスト, 挿入, 削除, 照会 のジェネリクス
 
+/*
+型を any から comparable に変えれば多分比較演算使える
+*/
+
 package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
-type List[T any] struct {
+type List[T comparable] struct {
 	next *List[T]
 	prev *List[T]
 	val T
 }
 
-func new[T any] (v T) *List[T]{
+func new[T comparable] (v T) *List[T]{
 	return &List[T]{nil, nil, v}
 }
 
@@ -24,10 +29,10 @@ func (l *List[T]) add(v T) {
 	l.next = p
 }
 
-func (l *List[T]) delete (n int) bool {
+func (l *List[T]) delete (n T) bool {
 	i := 0
-	for p := l; p != l.prev; p = p.next {
-		if n == i && p.prev != nil {
+	for p := l.next; p != l; p = p.next {
+		if n == p.val {
 			p.prev.next = p.next
 			p.next.prev = p.prev 
 			p.prev = nil 
@@ -55,19 +60,19 @@ func (l *List[T]) show() {
 }
 
 func main() {
-	list := new(0)			// sentinel
+	list := new("sentinel")			// sentinel
 	list.prev = list
 	list.next = list
 	for i := 1; i < 10; i++ {
 		if i%2 != 0 {
-			list.add(i)
+			list.add("hello" + strconv.Itoa(i))
 		}
 	}
 	list.show()
-	list.delete(1)
+	list.delete("hello1")
 	list.show()
-	list.delete(2)
+	list.delete("hello 3")
 	list.show()
-	list.delete(3)
+	list.delete("hello5")
 	list.show()
 }
